@@ -8,7 +8,7 @@ export function DashboardContent() {
   const { pageTitle } = useNav()
 
   return (
-    <div className={`flex flex-1 flex-col bg-gray-50 ${pageTitle === "企業管理" ? "" : "gap-4 p-6"}`}>
+    <div className={`flex flex-1 flex-col bg-gray-50 ${pageTitle === "企業管理" ? "" : "gap-4 p-4 sm:p-6"}`}>
       {pageTitle === "總覽" && <OverviewSection />}
       {pageTitle === "企業管理" && <EnterpriseSettingsSection />}
     </div>

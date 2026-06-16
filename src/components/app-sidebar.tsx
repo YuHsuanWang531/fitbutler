@@ -13,12 +13,12 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import {
-  BarChart3Icon,
+  ChartColumnBigIcon,
   CircleDollarSignIcon,
-  HomeIcon,
   IdCardIcon,
+  HomeIcon,
   PackageIcon,
-  Settings2Icon,
+  SettingsIcon,
   TagIcon,
   UsersIcon,
   ZapIcon,
@@ -41,7 +41,7 @@ const data = {
     {
       title: "總覽",
       url: "#",
-      icon: <BarChart3Icon />,
+      icon: <ChartColumnBigIcon />,
       isActive: true,
     },
     {
@@ -95,7 +95,7 @@ const data = {
     {
       title: "設定",
       url: "#",
-      icon: <Settings2Icon />,
+      icon: <SettingsIcon />,
       items: [
         { title: "企業管理", url: "#" },
         { title: "收款設定", url: "#" },

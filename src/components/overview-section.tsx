@@ -23,28 +23,20 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
-const TEAL = "#48b4c4"
-const PINK = "#d7006f"
-const RED = "#f33f5e"
-const GRAY = "#6b7280"
-const BG_LIGHT = "#f8f9fa"
-const BG_YELLOW = "#fdfbe7"
-const BG_TEAL_LIGHT = "#f3fdff"
-
 // ── Chart configs & data ─────────────────────────────────────────────────────
 
 const donutConfig: ChartConfig = {
-  collected: { label: "收款率", color: TEAL },
+  collected: { label: "收款率", color: "var(--color-teal)" },
   remaining: { label: "未收", color: "#e5e7eb" },
 }
 const donutData = [
-  { name: "collected", value: 55, fill: TEAL },
+  { name: "collected", value: 55, fill: "var(--color-teal)" },
   { name: "remaining", value: 45, fill: "#e5e7eb" },
 ]
 
 const barConfig: ChartConfig = {
-  actual: { label: "實收", color: TEAL },
-  gap: { label: "應收", color: GRAY },
+  actual: { label: "實收", color: "var(--color-teal)" },
+  gap: { label: "應收", color: "#6b7280" },
 }
 const barData = [
   { name: "空間租賃費", actual: 350000, gap: 450000 },
@@ -52,8 +44,8 @@ const barData = [
 ]
 
 const trendConfig: ChartConfig = {
-  actual: { label: "實際收入", color: TEAL },
-  expected: { label: "應收收入", color: GRAY },
+  actual: { label: "實際收入", color: "var(--color-teal)" },
+  expected: { label: "應收收入", color: "#6b7280" },
 }
 const trendData = [
   { month: "Nov", actual: 13000, expected: 22000 },
@@ -65,15 +57,15 @@ const trendData = [
 ]
 
 const vacancyConfig: ChartConfig = {
-  within14: { label: "14 天內", color: TEAL },
-  day15to30: { label: "15-30 天", color: PINK },
-  day31to60: { label: "31-60 天", color: GRAY },
+  within14: { label: "14 天內", color: "var(--color-teal)" },
+  day15to30: { label: "15-30 天", color: "var(--color-brand)" },
+  day31to60: { label: "31-60 天", color: "#6b7280" },
   over61: { label: "61 天以上", color: "#111827" },
 }
 const vacancyData = [
-  { name: "within14", value: 8, fill: TEAL },
-  { name: "day15to30", value: 4, fill: PINK },
-  { name: "day31to60", value: 3, fill: GRAY },
+  { name: "within14", value: 8, fill: "var(--color-teal)" },
+  { name: "day15to30", value: 4, fill: "var(--color-brand)" },
+  { name: "day31to60", value: 3, fill: "#6b7280" },
   { name: "over61", value: 5, fill: "#111827" },
 ]
 
@@ -91,13 +83,13 @@ function SimpleDonut({ percent, label }: { percent: number; label: string }) {
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}
         className="absolute" style={{ transform: "rotate(-90deg)" }}>
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth={20} />
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke={TEAL} strokeWidth={20}
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--color-teal)" strokeWidth={20}
           strokeDasharray={`${circumference * (percent / 100)} ${circumference}`}
           strokeLinecap="butt" />
       </svg>
       <div className="relative text-center">
         <p className="text-[30px] font-semibold leading-none text-black">{percent}%</p>
-        <p className="mt-1 text-xs" style={{ color: GRAY }}>{label}</p>
+        <p className="mt-1 text-xs text-gray-500">{label}</p>
       </div>
     </div>
   )
@@ -117,7 +109,7 @@ function PaymentDonut() {
                 return (
                   <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
                     <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) - 3} fontSize="30" fontWeight="600" fill="black">55%</tspan>
-                    <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 21} fontSize="12" fill={GRAY}>收款率</tspan>
+                    <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 21} fontSize="12" fill="#6b7280">收款率</tspan>
                   </text>
                 )
               }
@@ -126,7 +118,7 @@ function PaymentDonut() {
         </PieChart>
       </ChartContainer>
       </div>
-      <p className="text-sm text-center" style={{ color: TEAL }}>↑+4% (對比 9/1~9/30)</p>
+      <p className="text-sm text-center text-teal">↑+4% (對比 9/1~9/30)</p>
     </div>
   )
 }
@@ -135,14 +127,14 @@ function RentalBarChart() {
   return (
     <ChartContainer config={barConfig} className="h-[210px] flex-1 min-w-0">
       <BarChart data={barData} barSize={48}>
-        <CartesianGrid vertical={false} stroke="#f0f0f0" />
-        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: GRAY }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: GRAY }}
+        <CartesianGrid vertical={false} stroke="#f3f4f6" />
+        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
+        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }}
           ticks={[150000, 300000, 450000, 600000, 750000, 900000]}
           tickFormatter={(v) => `${v / 1000}k`} width={36} />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <Bar dataKey="actual" stackId="a" fill={TEAL} radius={[0, 0, 4, 4]} />
-        <Bar dataKey="gap" stackId="a" fill={GRAY} radius={[4, 4, 0, 0]} />
+        <Bar dataKey="actual" stackId="a" fill="var(--color-teal)" radius={[0, 0, 4, 4]} />
+        <Bar dataKey="gap" stackId="a" fill="#6b7280" radius={[4, 4, 0, 0]} />
         <ChartLegend content={<ChartLegendContent />} />
       </BarChart>
     </ChartContainer>
@@ -153,14 +145,14 @@ function TrendLineChart() {
   return (
     <ChartContainer config={trendConfig} className="h-[203px] w-full">
       <LineChart data={trendData} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
-        <CartesianGrid vertical={false} stroke="#f0f0f0" />
-        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: GRAY }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: GRAY }}
+        <CartesianGrid vertical={false} stroke="#f3f4f6" />
+        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
+        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }}
           ticks={[8000, 12000, 16000, 20000, 24000]}
           tickFormatter={(v) => `NT$${v / 1000}k`} width={48} />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <Line dataKey="actual" type="monotone" stroke={TEAL} strokeWidth={2} dot={{ r: 4, fill: TEAL }} />
-        <Line dataKey="expected" type="monotone" stroke={GRAY} strokeWidth={2} dot={{ r: 4, fill: GRAY }} />
+        <Line dataKey="actual" type="monotone" stroke="var(--color-teal)" strokeWidth={2} dot={{ r: 4, fill: "var(--color-teal)" }} />
+        <Line dataKey="expected" type="monotone" stroke="#6b7280" strokeWidth={2} dot={{ r: 4, fill: "#6b7280" }} />
         <ChartLegend content={<ChartLegendContent />} />
       </LineChart>
     </ChartContainer>
@@ -179,7 +171,7 @@ function VacancyPieChart() {
               return (
                 <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
                   <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) - 8} fontSize="30" fontWeight="600" fill="black">20</tspan>
-                  <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 18} fontSize="14" fill={GRAY}>間</tspan>
+                  <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 18} fontSize="14" fill="#6b7280">間</tspan>
                 </text>
               )
             }
@@ -215,7 +207,7 @@ function OccupancyCard() {
                 <span className="font-semibold">{loc.ratio}</span>
               </div>
               <Progress value={loc.value}
-                className="gap-0 [&>[data-slot=progress-track]]:h-2 [&>[data-slot=progress-track]]:bg-gray-200 [&_[data-slot=progress-indicator]]:bg-[#48b4c4]" />
+                className="gap-0 [&>[data-slot=progress-track]]:h-2 [&>[data-slot=progress-track]]:bg-gray-200 [&_[data-slot=progress-indicator]]:bg-teal" />
             </div>
           ))}
         </div>
@@ -226,9 +218,9 @@ function OccupancyCard() {
 
 function LeaseReminderCard() {
   const rows = [
-    { count: "5 件", label: "30 天內到期", color: TEAL },
-    { count: "10 件", label: "31-60 天內到期", color: TEAL },
-    { count: "12 件", label: "61-90 天內到期", color: TEAL },
+    { count: "5 件", label: "30 天內到期", color: "var(--color-teal)" },
+    { count: "10 件", label: "31-60 天內到期", color: "var(--color-teal)" },
+    { count: "12 件", label: "61-90 天內到期", color: "var(--color-teal)" },
   ]
   return (
     <Card className="flex-1 rounded-[6px] py-6 gap-4">
@@ -238,19 +230,17 @@ function LeaseReminderCard() {
         </CardTitle>
       </CardHeader>
       <CardContent className="px-6 py-0 flex flex-col items-center gap-4">
-        <div className="flex flex-col items-center justify-center rounded-[6px] h-[100px] w-full text-center px-4"
-          style={{ backgroundColor: BG_TEAL_LIGHT }}>
-          <p className="text-[30px] font-semibold leading-none" style={{ color: TEAL }}>27 件</p>
-          <p className="text-xs mt-2" style={{ color: GRAY }}>關注 N 天內到期合約</p>
+        <div className="flex flex-col items-center justify-center rounded-[6px] h-[100px] w-full text-center px-4 bg-cyan-50">
+          <p className="text-[30px] font-semibold leading-none text-teal">27 件</p>
+          <p className="text-xs mt-2 text-gray-500">關注 N 天內到期合約</p>
         </div>
         <div className="flex flex-col gap-2 w-full">
           {rows.map(row => (
-            <div key={row.label} className="flex flex-col gap-2 px-6 py-4 rounded-[6px]"
-              style={{ backgroundColor: BG_LIGHT }}>
+            <div key={row.label} className="flex flex-col gap-2 px-6 py-4 rounded-[6px] bg-gray-50">
               <p className="text-xl font-semibold">{row.count}</p>
               <div className="flex items-center gap-2">
                 <div className="size-2 rounded-full" style={{ backgroundColor: row.color }} />
-                <p className="text-xs" style={{ color: GRAY }}>{row.label}</p>
+                <p className="text-xs text-gray-500">{row.label}</p>
               </div>
             </div>
           ))}
@@ -262,9 +252,9 @@ function LeaseReminderCard() {
 
 function VacancyCard() {
   const rows = [
-    { label: "14 天內 (8)", color: TEAL },
-    { label: "15-30 天 (4)", color: PINK },
-    { label: "31-60 天 (3)", color: GRAY },
+    { label: "14 天內 (8)", color: "var(--color-teal)" },
+    { label: "15-30 天 (4)", color: "var(--color-brand)" },
+    { label: "31-60 天 (3)", color: "#6b7280" },
     { label: "61 天以上 (5)", color: "#111827" },
   ]
   return (
@@ -321,9 +311,9 @@ export function OverviewSection() {
       <Card className="rounded-[6px] py-6 gap-4">
         <CardContent className="px-6 py-0 flex flex-col gap-4">
           {/* Filters */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Select defaultValue="信義據點">
-              <SelectTrigger className="h-9 min-w-[220px] bg-white rounded-[6px]">
+              <SelectTrigger className="h-9 w-full sm:w-auto sm:min-w-[220px] bg-white rounded-[6px]">
                 <SelectValue placeholder="選擇據點" />
               </SelectTrigger>
               <SelectContent>
@@ -339,7 +329,7 @@ export function OverviewSection() {
               <PopoverTrigger
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "h-9 min-w-[220px] justify-start text-left font-normal bg-white rounded-[6px]",
+                  "h-9 w-full sm:w-auto sm:min-w-[220px] justify-start text-left font-normal bg-white rounded-[6px]",
                   !dateRange && "text-muted-foreground"
                 )}
               >
@@ -374,40 +364,38 @@ export function OverviewSection() {
               <CardTitle className="text-lg font-semibold">收款進度</CardTitle>
             </CardHeader>
             <CardContent className="px-6 py-0">
-              <div className="flex gap-10 items-center">
+              <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center">
                 <div className="flex flex-1 flex-col gap-4 min-w-0">
                   <div className="flex flex-col gap-3">
                     <div className="flex flex-col gap-2">
-                      <span className="text-sm" style={{ color: GRAY }}>帳單總額</span>
+                      <span className="text-sm text-gray-500">帳單總額</span>
                       <span className="text-2xl font-semibold">$1,320,000</span>
                     </div>
                     <div className="h-2 w-full rounded-[10px] overflow-hidden flex">
-                      <div style={{ width: `${tealPct}%`, backgroundColor: TEAL }} />
-                      <div style={{ width: `${pinkPct}%`, backgroundColor: PINK }} />
-                      <div className="flex-1" style={{ backgroundColor: GRAY }} />
+                      <div style={{ width: `${tealPct}%`, backgroundColor: "var(--color-teal)" }} />
+                      <div style={{ width: `${pinkPct}%`, backgroundColor: "var(--color-brand)" }} />
+                      <div className="flex-1 bg-gray-500" />
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     {[
-                      { color: TEAL, label: "實收", amount: "$660,000", sub: "含押金 $40,000", link: false },
-                      { color: PINK, label: "逾時未收", amount: "$540,000", sub: "查看明細", link: true },
-                      { color: GRAY, label: "待收", amount: "$120,000", sub: "查看明細", link: true },
+                      { color: "var(--color-teal)", label: "實收", amount: "$660,000", sub: "含押金 $40,000", link: false },
+                      { color: "var(--color-brand)", label: "逾時未收", amount: "$540,000", sub: "查看明細", link: true },
+                      { color: "#6b7280", label: "待收", amount: "$120,000", sub: "查看明細", link: true },
                     ].map(item => (
-                      <div key={item.label} className="flex-1 flex flex-col gap-2 px-6 py-4 rounded-[6px]"
-                        style={{ backgroundColor: BG_LIGHT }}>
+                      <div key={item.label} className="flex-1 flex flex-col gap-2 px-6 py-4 rounded-[6px] bg-gray-50">
                         <div className="flex items-center gap-2">
                           <div className="size-2 rounded-full" style={{ backgroundColor: item.color }} />
-                          <span className="text-sm" style={{ color: GRAY }}>{item.label}</span>
+                          <span className="text-sm text-gray-500">{item.label}</span>
                         </div>
                         <span className="text-xl font-semibold">{item.amount}</span>
                         {item.link
-                          ? <a href="#" className="text-sm underline" style={{ color: TEAL }}>{item.sub}</a>
-                          : <span className="text-sm" style={{ color: GRAY }}>{item.sub}</span>}
+                          ? <a href="#" className="text-sm underline text-teal">{item.sub}</a>
+                          : <span className="text-sm text-gray-500">{item.sub}</span>}
                       </div>
                     ))}
                   </div>
-                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-[6px]"
-                    style={{ backgroundColor: BG_YELLOW }}>
+                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-[6px] bg-yellow-50">
                     <p className="flex-1 text-xs">💡 另有 3 筆帳單尚未出帳，出帳後將自動納入統計</p>
                     <div className="flex items-center gap-1 shrink-0">
                       <a href="#" className="text-xs underline whitespace-nowrap">前往出帳</a>
@@ -421,24 +409,24 @@ export function OverviewSection() {
           </Card>
 
           {/* 租金收入摘要 + 總押金餘額 */}
-          <div className="flex gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
             <Card className="flex-1 rounded-[6px] py-6 gap-4">
               <CardHeader className="px-6 py-0">
                 <CardTitle className="text-lg font-semibold">租金收入摘要</CardTitle>
               </CardHeader>
               <CardContent className="px-6 py-0">
-                <div className="flex gap-4">
-                  <div className="flex flex-col gap-4 w-[190px] shrink-0">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col gap-4 sm:w-[190px] sm:shrink-0">
                     <div className="flex flex-col gap-2">
-                      <span className="text-sm" style={{ color: GRAY }}>本期收入</span>
+                      <span className="text-sm text-gray-500">本期收入</span>
                       <span className="text-2xl font-semibold">$434,000</span>
-                      <span className="text-sm" style={{ color: TEAL }}>↑+4% (對比 9/1~9/30)</span>
+                      <span className="text-sm text-teal">↑+4% (對比 9/1~9/30)</span>
                     </div>
                     <Separator />
                     <div className="flex flex-col gap-2">
-                      <span className="text-sm" style={{ color: GRAY }}>本期應收收入</span>
+                      <span className="text-sm text-gray-500">本期應收收入</span>
                       <span className="text-2xl font-semibold">$756,000</span>
-                      <span className="text-sm" style={{ color: TEAL }}>收入達成率 57%</span>
+                      <span className="text-sm text-teal">收入達成率 57%</span>
                     </div>
                   </div>
                   <RentalBarChart />
@@ -453,15 +441,15 @@ export function OverviewSection() {
               <CardContent className="px-6 py-0">
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">
-                    <span className="text-sm" style={{ color: GRAY }}>押金總餘額</span>
+                    <span className="text-sm text-gray-500">押金總餘額</span>
                     <span className="text-2xl font-semibold">$1,275,000</span>
                   </div>
                   <Separator />
                   <div className="flex flex-col gap-2 text-sm">
                     {[
-                      { label: "當期收押金", value: "+NT$40,000", color: TEAL },
-                      { label: "當期退押金", value: "-NT$15,000", color: RED },
-                      { label: "押金轉費用", value: "-NT$8,000", color: RED },
+                      { label: "當期收押金", value: "+NT$40,000", color: "var(--color-teal)" },
+                      { label: "當期退押金", value: "-NT$15,000", color: "#f43f5e" },
+                      { label: "押金轉費用", value: "-NT$8,000", color: "#f43f5e" },
                     ].map(row => (
                       <div key={row.label} className="flex items-center justify-between">
                         <span>{row.label}</span>
@@ -493,7 +481,7 @@ export function OverviewSection() {
       </div>
 
       {/* 三個 KPI 卡片 */}
-      <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
         <OccupancyCard />
         <LeaseReminderCard />
         <VacancyCard />

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNav } from "@/contexts/nav-context"
 import {
   Collapsible,
@@ -15,6 +15,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { ChevronRightIcon } from "lucide-react"
 
@@ -28,6 +29,7 @@ type NavItem = {
 
 export function NavMain({ items }: { items: NavItem[] }) {
   const { pageTitle, setPageTitle } = useNav()
+  const { state, setOpen } = useSidebar()
 
   const [openItems, setOpenItems] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(
@@ -36,6 +38,15 @@ export function NavMain({ items }: { items: NavItem[] }) {
         .map((item) => [item.title, true])
     )
   )
+
+  useEffect(() => {
+    const parent = items.find((item) =>
+      item.items?.some((sub) => sub.title === pageTitle)
+    )
+    if (parent) {
+      setOpenItems((prev) => ({ ...prev, [parent.title]: true }))
+    }
+  }, [pageTitle, items])
 
   const toggleItem = (title: string, open: boolean) => {
     setOpenItems((prev) => ({ ...prev, [title]: open }))
@@ -49,12 +60,19 @@ export function NavMain({ items }: { items: NavItem[] }) {
             <Collapsible
               key={item.title}
               open={!!openItems[item.title]}
-              onOpenChange={(open) => toggleItem(item.title, open)}
+              onOpenChange={(open) => {
+                if (state === "collapsed") {
+                  setOpen(true)
+                  toggleItem(item.title, true)
+                } else {
+                  toggleItem(item.title, open)
+                }
+              }}
               className="group/collapsible"
               render={<SidebarMenuItem />}
             >
               <CollapsibleTrigger
-                render={<SidebarMenuButton tooltip={item.title} />}
+                render={<SidebarMenuButton tooltip={item.title} className="h-auto py-2" />}
               >
                 {item.icon}
                 <span>{item.title}</span>
@@ -68,6 +86,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                         render={<a href={subItem.url} />}
                         isActive={pageTitle === subItem.title}
                         onClick={() => setPageTitle(subItem.title)}
+                        className="h-auto py-2"
                       >
                         <span>{subItem.title}</span>
                       </SidebarMenuSubButton>
@@ -83,6 +102,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                 tooltip={item.title}
                 render={<a href={item.url} />}
                 onClick={() => setPageTitle(item.title)}
+                className="h-auto py-2"
               >
                 {item.icon}
                 <span>{item.title}</span>
