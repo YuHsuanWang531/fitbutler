@@ -1,12 +1,10 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { X, HelpCircle, PlusIcon, CalendarIcon } from "lucide-react"
+import { X, HelpCircle, PlusIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Switch } from "@/components/ui/switch"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -35,12 +33,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 
-const timeOptions = Array.from({ length: 48 }, (_, i) => {
-  const h = Math.floor(i / 2).toString().padStart(2, "0")
-  const m = i % 2 === 0 ? "00" : "30"
-  return `${h}:${m}`
-})
-
 const countryItems = [
   { value: "", label: "請選擇公司登記國家" },
   { value: "tw", label: "台灣" },
@@ -65,11 +57,28 @@ const countryItems = [
   { value: "br", label: "巴西" },
 ]
 
-const currencyItems = [
-  { value: "", label: "請選擇使用幣別" },
-  { value: "twd", label: "新台幣 (TWD)" },
-  { value: "myr", label: "馬來西亞令吉 (MYR)" },
-]
+const countryCurrencyMap: Record<string, string> = {
+  tw: "新台幣 (TWD)",
+  my: "馬來西亞令吉 (MYR)",
+  jp: "日圓 (JPY)",
+  kr: "韓元 (KRW)",
+  sg: "新加坡幣 (SGD)",
+  hk: "港幣 (HKD)",
+  cn: "人民幣 (CNY)",
+  th: "泰銖 (THB)",
+  vn: "越南盾 (VND)",
+  ph: "菲律賓披索 (PHP)",
+  id: "印尼盾 (IDR)",
+  us: "美元 (USD)",
+  gb: "英鎊 (GBP)",
+  de: "歐元 (EUR)",
+  fr: "歐元 (EUR)",
+  au: "澳幣 (AUD)",
+  ca: "加拿大幣 (CAD)",
+  nz: "紐西蘭幣 (NZD)",
+  in: "印度盧比 (INR)",
+  br: "巴西雷亞爾 (BRL)",
+}
 
 interface AddCompanySheetProps {
   open: boolean
@@ -102,13 +111,15 @@ function CountryCombobox({
   disabled,
   placeholder = "請選擇公司登記國家",
   addLabel,
+  onValueChange,
 }: {
   disabled?: boolean
   placeholder?: string
   addLabel?: string
+  onValueChange?: (value: string) => void
 }) {
   return (
-    <Combobox items={countryItems} defaultValue={countryItems[0].value} disabled={disabled}>
+    <Combobox items={countryItems} defaultValue={countryItems[0].value} disabled={disabled} onValueChange={(v) => v && onValueChange?.(v)}>
       <ComboboxTrigger
         render={
           <Button variant="outline" className="w-full justify-between font-normal">
@@ -142,32 +153,6 @@ function CountryCombobox({
   )
 }
 
-function CurrencyCombobox({ disabled }: { disabled?: boolean }) {
-  return (
-    <Combobox items={currencyItems} defaultValue={currencyItems[0].value} disabled={disabled}>
-      <ComboboxTrigger
-        render={
-          <Button variant="outline" className="w-full justify-between font-normal">
-            <ComboboxValue placeholder="請選擇使用幣別" />
-          </Button>
-        }
-      />
-      <ComboboxContent>
-        <ComboboxInput showTrigger={false} className="max-w-full" placeholder="請選擇使用幣別" />
-        <ComboboxEmpty>找不到符合的幣別</ComboboxEmpty>
-        <ComboboxList>
-          <ComboboxCollection>
-            {(item) => (
-              <ComboboxItem key={item.value} value={item.value}>
-                {item.label}
-              </ComboboxItem>
-            )}
-          </ComboboxCollection>
-        </ComboboxList>
-      </ComboboxContent>
-    </Combobox>
-  )
-}
 
 function FileInputField({ id }: { id: string }) {
   const [fileName, setFileName] = useState("未選擇檔案")
@@ -200,8 +185,7 @@ function FileInputField({ id }: { id: string }) {
 export function AddCompanySheet({ open, onOpenChange }: AddCompanySheetProps) {
   const [isLegalPerson, setIsLegalPerson] = useState(false)
   const [isActive, setIsActive] = useState(true)
-  const [establishDate, setEstablishDate] = useState<Date | undefined>(undefined)
-  const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const [country, setCountry] = useState("")
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -234,7 +218,7 @@ export function AddCompanySheet({ open, onOpenChange }: AddCompanySheetProps) {
             {/* 公司登記國家 */}
             <div className="flex flex-col w-[300px]">
               <FieldLabel label="公司登記國家" required />
-              <CountryCombobox addLabel="新增國家" />
+              <CountryCombobox addLabel="新增國家" onValueChange={setCountry} />
             </div>
 
             {/* 營業登記號碼 */}
@@ -246,60 +230,13 @@ export function AddCompanySheet({ open, onOpenChange }: AddCompanySheetProps) {
             {/* 使用幣別 */}
             <div className="flex flex-col w-[300px]">
               <FieldLabel label="使用幣別" required />
-              <CurrencyCombobox disabled />
-            </div>
-
-            {/* 公司成立日期 */}
-            <div className="flex flex-col w-[300px]">
-              <FieldLabel label="公司成立日期" htmlFor="establish-date" />
-              <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
-                <PopoverTrigger
-                  render={<Button variant="outline" id="establish-date" className="w-full justify-between font-normal" />}
-                >
-                  {establishDate
-                    ? establishDate.toLocaleDateString("zh-TW")
-                    : <span className="text-muted-foreground">選擇日期</span>}
-                  <CalendarIcon className="size-4 text-muted-foreground" />
-                </PopoverTrigger>
-                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={establishDate}
-                    onSelect={(date) => {
-                      setEstablishDate(date)
-                      setDatePickerOpen(false)
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* 營業時間 */}
-            <div className="flex flex-col w-[300px]">
-              <FieldLabel label="營業時間" />
-              <div className="flex items-center gap-2">
-                <Select>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="開始時間" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {timeOptions.map((t) => (
-                      <SelectItem key={t} value={t}>{t}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <span className="text-muted-foreground text-sm shrink-0">至</span>
-                <Select>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="結束時間" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {timeOptions.map((t) => (
-                      <SelectItem key={t} value={t}>{t}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Input
+                disabled
+                readOnly
+                value={country ? (countryCurrencyMap[country] ?? "") : ""}
+                placeholder="請選擇公司登記國家"
+                className="bg-secondary"
+              />
             </div>
 
             {/* 公司負責人 */}
