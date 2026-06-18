@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
 
       <div className="relative flex w-full max-w-[372px] flex-col gap-4">
         {/* Language selector */}
-        <Select value={language} onValueChange={setLanguage}>
+        <Select value={language} onValueChange={(v) => v && setLanguage(v)}>
           <SelectTrigger className="w-[160px] h-9! rounded-[8px] border-0 bg-white/20 text-sm text-white [&_svg]:text-white">
             <LanguagesIcon className="size-4 shrink-0" />
             <SelectValue>{(v: unknown) => v as string}</SelectValue>
