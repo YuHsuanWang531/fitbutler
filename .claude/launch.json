@@ -7,6 +7,18 @@
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "portfolio",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "4001", "/Users/wangyuxuan/Desktop/AI agent/portfolio"],
+      "port": 4001
+    },
+    {
+      "name": "i18n-manager",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "4002", "/Users/wangyuxuan/Desktop/AI agent"],
+      "port": 4002
     }
   ]
 }
