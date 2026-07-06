@@ -1,10 +1,7 @@
-import type { ComponentType } from 'react'
-
 import {
   BarChart3Icon,
   CalendarIcon,
   ChartLineIcon,
-  ChevronRightIcon,
   CreditCardIcon,
   DumbbellIcon,
   GaugeIcon,
@@ -17,45 +14,17 @@ import {
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent } from '@/components/ui/card'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarTrigger
 } from '@/components/ui/sidebar'
+import { MenuItem, SidebarGroupedMenuItems } from '@/components/sidebar-grouped-menu-items'
 
 import WorkspaceSwitcher from '@/components/shadcn-studio/blocks/sidebar-workspace-switcher'
-
-type MenuSubItem = {
-  label: string
-  href: string
-  badge?: string
-}
-
-type MenuItem = {
-  icon: ComponentType
-  label: string
-} & (
-  | {
-      href: string
-      badge?: string
-      items?: never
-    }
-  | { href?: never; badge?: never; items: MenuSubItem[] }
-)
 
 const menuItems: MenuItem[] = [
   {
@@ -128,45 +97,6 @@ const pagesItems: MenuItem[] = [
     ]
   }
 ]
-
-const SidebarGroupedMenuItems = ({ data, groupLabel }: { data: MenuItem[]; groupLabel?: string }) => {
-  return (
-    <SidebarGroup>
-      {groupLabel && <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>}
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {data.map(item =>
-            item.items ? (
-              <Collapsible className='group/collapsible' key={item.label}>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger render={<SidebarMenuButton tooltip={item.label} className='truncate' />}><item.icon /><span>{item.label}</span><ChevronRightIcon className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' /></CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items.map(subItem => (
-                        <SidebarMenuSubItem key={subItem.label}>
-                          <SidebarMenuSubButton className='justify-between' render={<a href={subItem.href} />}>{subItem.label}{subItem.badge && (
-                            <span className='bg-primary/10 flex h-5 min-w-5 items-center justify-center rounded-full text-xs'>
-                              {subItem.badge}
-                            </span>
-                          )}</SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-            ) : (
-              <SidebarMenuItem key={item.label}>
-                <SidebarMenuButton tooltip={item.label} render={<a href={item.href} />}><item.icon /><span>{item.label}</span></SidebarMenuButton>
-                {item.badge && <SidebarMenuBadge className='bg-primary/10 rounded-full'>{item.badge}</SidebarMenuBadge>}
-              </SidebarMenuItem>
-            )
-          )}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  )
-}
 
 const SidebarPage = () => {
   return (

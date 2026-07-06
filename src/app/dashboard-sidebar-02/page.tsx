@@ -1,10 +1,7 @@
-import type { ComponentType } from 'react'
-
 import {
   ActivityIcon,
   CalendarIcon,
   ChartNoAxesCombinedIcon,
-  ChevronRightIcon,
   DumbbellIcon,
   FileBarChartIcon,
   FlameIcon,
@@ -16,44 +13,17 @@ import {
 } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarProvider,
   SidebarTrigger
 } from '@/components/ui/sidebar'
-
-type MenuSubItem = {
-  label: string
-  href: string
-  badge?: string
-}
-
-type MenuItem = {
-  icon: ComponentType
-  label: string
-} & (
-  | {
-      href: string
-      badge?: string
-      items?: never
-    }
-  | { href?: never; badge?: never; items: MenuSubItem[] }
-)
+import { MenuItem, SidebarGroupedMenuItems } from '@/components/sidebar-grouped-menu-items'
 
 const menuItems: MenuItem[] = [
   {
@@ -133,45 +103,6 @@ const supportingFeatureItems: MenuItem[] = [
   }
 ]
 
-const SidebarGroupedMenuItems = ({ data, groupLabel }: { data: MenuItem[]; groupLabel?: string }) => {
-  return (
-    <SidebarGroup>
-      {groupLabel && <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>}
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {data.map(item =>
-            item.items ? (
-              <Collapsible className='group/collapsible' key={item.label}>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger render={<SidebarMenuButton className='truncate' />}><item.icon /><span>{item.label}</span><ChevronRightIcon className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' /></CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items.map(subItem => (
-                        <SidebarMenuSubItem key={subItem.label}>
-                          <SidebarMenuSubButton className='justify-between' render={<a href={subItem.href} />}>{subItem.label}{subItem.badge && (
-                            <span className='bg-primary/10 flex h-5 min-w-5 items-center justify-center rounded-full text-xs'>
-                              {subItem.badge}
-                            </span>
-                          )}</SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-            ) : (
-              <SidebarMenuItem key={item.label}>
-                <SidebarMenuButton render={<a href={item.href} />}><item.icon /><span>{item.label}</span></SidebarMenuButton>
-                {item.badge && <SidebarMenuBadge className='bg-primary/10 rounded-full'>{item.badge}</SidebarMenuBadge>}
-              </SidebarMenuItem>
-            )
-          )}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  )
-}
-
 const SidebarPage = () => {
   return (
     <div className='flex min-h-dvh w-full'>
@@ -186,10 +117,10 @@ const SidebarPage = () => {
               <p className='text-sm font-medium'>Alex Chen</p>
               <p className='text-xs font-light'>alex.chen@fitbutler.com</p>
             </div>
-            <div className='flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1'>
-              <FlameIcon className='size-3 text-primary' />
-              <span className='text-xs font-medium text-primary'>7-day streak</span>
-            </div>
+            <Badge variant='secondary' className='h-auto gap-2 rounded-full bg-primary/10 px-3 py-1 text-primary [&>svg]:size-3!'>
+              <FlameIcon className='text-primary' />
+              7-day streak
+            </Badge>
           </SidebarHeader>
           <SidebarContent>
             <SidebarGroupedMenuItems data={menuItems} />

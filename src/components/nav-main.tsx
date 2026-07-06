@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useNav } from "@/contexts/nav-context"
 import {
   Collapsible,
@@ -27,26 +27,27 @@ type NavItem = {
   items?: { title: string; url: string }[]
 }
 
+function findActiveParentTitle(items: NavItem[], pageTitle: string) {
+  return items.find((item) => item.items?.some((sub) => sub.title === pageTitle))?.title
+}
+
 export function NavMain({ items }: { items: NavItem[] }) {
   const { pageTitle, setPageTitle } = useNav()
   const { state, setOpen } = useSidebar()
 
-  const [openItems, setOpenItems] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(
-      items
-        .filter((item) => item.items?.some((sub) => sub.title === pageTitle))
-        .map((item) => [item.title, true])
-    )
-  )
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>(() => {
+    const parentTitle = findActiveParentTitle(items, pageTitle)
+    return parentTitle ? { [parentTitle]: true } : {}
+  })
+  const [prevPageTitle, setPrevPageTitle] = useState(pageTitle)
 
-  useEffect(() => {
-    const parent = items.find((item) =>
-      item.items?.some((sub) => sub.title === pageTitle)
-    )
-    if (parent) {
-      setOpenItems((prev) => ({ ...prev, [parent.title]: true }))
+  if (pageTitle !== prevPageTitle) {
+    setPrevPageTitle(pageTitle)
+    const parentTitle = findActiveParentTitle(items, pageTitle)
+    if (parentTitle) {
+      setOpenItems((prev) => ({ ...prev, [parentTitle]: true }))
     }
-  }, [pageTitle, items])
+  }
 
   const toggleItem = (title: string, open: boolean) => {
     setOpenItems((prev) => ({ ...prev, [title]: open }))

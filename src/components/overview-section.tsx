@@ -9,12 +9,13 @@ import {
   XAxis, YAxis, CartesianGrid,
 } from "recharts"
 import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
@@ -25,18 +26,9 @@ import {
 
 // ── Chart configs & data ─────────────────────────────────────────────────────
 
-const donutConfig: ChartConfig = {
-  collected: { label: "收款率", color: "var(--color-teal)" },
-  remaining: { label: "未收", color: "#e5e7eb" },
-}
-const donutData = [
-  { name: "collected", value: 55, fill: "var(--color-teal)" },
-  { name: "remaining", value: 45, fill: "#e5e7eb" },
-]
-
 const barConfig: ChartConfig = {
   actual: { label: "實收", color: "var(--color-teal)" },
-  gap: { label: "應收", color: "#6b7280" },
+  gap: { label: "應收", color: "var(--color-gray-500)" },
 }
 const barData = [
   { name: "空間租賃費", actual: 350000, gap: 450000 },
@@ -45,7 +37,7 @@ const barData = [
 
 const trendConfig: ChartConfig = {
   actual: { label: "實際收入", color: "var(--color-teal)" },
-  expected: { label: "應收收入", color: "#6b7280" },
+  expected: { label: "應收收入", color: "var(--color-gray-500)" },
 }
 const trendData = [
   { month: "Nov", actual: 13000, expected: 22000 },
@@ -59,39 +51,46 @@ const trendData = [
 const vacancyConfig: ChartConfig = {
   within14: { label: "14 天內", color: "var(--color-teal)" },
   day15to30: { label: "15-30 天", color: "var(--color-brand)" },
-  day31to60: { label: "31-60 天", color: "#6b7280" },
-  over61: { label: "61 天以上", color: "#111827" },
+  day31to60: { label: "31-60 天", color: "var(--color-gray-500)" },
+  over61: { label: "61 天以上", color: "var(--color-gray-900)" },
 }
 const vacancyData = [
   { name: "within14", value: 8, fill: "var(--color-teal)" },
   { name: "day15to30", value: 4, fill: "var(--color-brand)" },
-  { name: "day31to60", value: 3, fill: "#6b7280" },
-  { name: "over61", value: 5, fill: "#111827" },
+  { name: "day31to60", value: 3, fill: "var(--color-gray-500)" },
+  { name: "over61", value: 5, fill: "var(--color-gray-900)" },
 ]
 
 // ── Shared chart components ──────────────────────────────────────────────────
 
-function SimpleDonut({ percent, label }: { percent: number; label: string }) {
-  const size = 190
-  const r = 72
-  const cx = size / 2
-  const cy = size / 2
-  const circumference = 2 * Math.PI * r
-
+function Donut({ percent, label, color = "var(--color-teal)" }: { percent: number; label: string; color?: string }) {
+  const config: ChartConfig = {
+    value: { label, color },
+    remaining: { label: "剩餘", color: "var(--color-gray-200)" },
+  }
+  const data = [
+    { name: "value", value: percent, fill: color },
+    { name: "remaining", value: 100 - percent, fill: "var(--color-gray-200)" },
+  ]
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}
-        className="absolute" style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth={20} />
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--color-teal)" strokeWidth={20}
-          strokeDasharray={`${circumference * (percent / 100)} ${circumference}`}
-          strokeLinecap="butt" />
-      </svg>
-      <div className="relative text-center">
-        <p className="text-[30px] font-semibold leading-none text-black">{percent}%</p>
-        <p className="mt-1 text-xs text-gray-500">{label}</p>
-      </div>
-    </div>
+    <ChartContainer config={config} className="!aspect-auto size-[180px]">
+      <PieChart>
+        <Pie data={data} dataKey="value" nameKey="name"
+          innerRadius="68%" outerRadius="88%" strokeWidth={0}
+          startAngle={90} endAngle={-270}>
+          <Label content={({ viewBox }) => {
+            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+              return (
+                <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
+                  <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) - 3} fontSize="30" fontWeight="600" fill="black">{percent}%</tspan>
+                  <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 21} fontSize="12" fill="var(--color-gray-500)">{label}</tspan>
+                </text>
+              )
+            }
+          }} />
+        </Pie>
+      </PieChart>
+    </ChartContainer>
   )
 }
 
@@ -99,24 +98,7 @@ function PaymentDonut() {
   return (
     <div className="flex flex-col items-center gap-6 shrink-0">
       <div className="size-[180px] shrink-0">
-      <ChartContainer config={donutConfig} className="!aspect-auto size-[180px]">
-        <PieChart>
-          <Pie data={donutData} dataKey="value" nameKey="name"
-            innerRadius="68%" outerRadius="88%" strokeWidth={0}
-            startAngle={90} endAngle={-270}>
-            <Label content={({ viewBox }) => {
-              if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                return (
-                  <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
-                    <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) - 3} fontSize="30" fontWeight="600" fill="black">55%</tspan>
-                    <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 21} fontSize="12" fill="#6b7280">收款率</tspan>
-                  </text>
-                )
-              }
-            }} />
-          </Pie>
-        </PieChart>
-      </ChartContainer>
+        <Donut percent={55} label="收款率" />
       </div>
       <p className="text-sm text-center text-teal">↑+4% (對比 9/1~9/30)</p>
     </div>
@@ -127,14 +109,14 @@ function RentalBarChart() {
   return (
     <ChartContainer config={barConfig} className="h-[210px] flex-1 min-w-0">
       <BarChart data={barData} barSize={48}>
-        <CartesianGrid vertical={false} stroke="#f3f4f6" />
-        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }}
+        <CartesianGrid vertical={false} stroke="var(--color-gray-100)" />
+        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--color-gray-500)" }} />
+        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--color-gray-500)" }}
           ticks={[150000, 300000, 450000, 600000, 750000, 900000]}
           tickFormatter={(v) => `${v / 1000}k`} width={36} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar dataKey="actual" stackId="a" fill="var(--color-teal)" radius={[0, 0, 4, 4]} />
-        <Bar dataKey="gap" stackId="a" fill="#6b7280" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="gap" stackId="a" fill="var(--color-gray-500)" radius={[4, 4, 0, 0]} />
         <ChartLegend content={<ChartLegendContent />} />
       </BarChart>
     </ChartContainer>
@@ -145,14 +127,14 @@ function TrendLineChart() {
   return (
     <ChartContainer config={trendConfig} className="h-[203px] w-full">
       <LineChart data={trendData} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
-        <CartesianGrid vertical={false} stroke="#f3f4f6" />
-        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
-        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "#6b7280" }}
+        <CartesianGrid vertical={false} stroke="var(--color-gray-100)" />
+        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--color-gray-500)" }} />
+        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--color-gray-500)" }}
           ticks={[8000, 12000, 16000, 20000, 24000]}
           tickFormatter={(v) => `NT$${v / 1000}k`} width={48} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Line dataKey="actual" type="monotone" stroke="var(--color-teal)" strokeWidth={2} dot={{ r: 4, fill: "var(--color-teal)" }} />
-        <Line dataKey="expected" type="monotone" stroke="#6b7280" strokeWidth={2} dot={{ r: 4, fill: "#6b7280" }} />
+        <Line dataKey="expected" type="monotone" stroke="var(--color-gray-500)" strokeWidth={2} dot={{ r: 4, fill: "var(--color-gray-500)" }} />
         <ChartLegend content={<ChartLegendContent />} />
       </LineChart>
     </ChartContainer>
@@ -171,7 +153,7 @@ function VacancyPieChart() {
               return (
                 <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
                   <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) - 8} fontSize="30" fontWeight="600" fill="black">20</tspan>
-                  <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 18} fontSize="14" fill="#6b7280">間</tspan>
+                  <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 18} fontSize="14" fill="var(--color-gray-500)">間</tspan>
                 </text>
               )
             }
@@ -180,6 +162,10 @@ function VacancyPieChart() {
       </PieChart>
     </ChartContainer>
   )
+}
+
+function ColorDot({ className }: { className: string }) {
+  return <div className={cn("size-2 rounded-full shrink-0", className)} />
 }
 
 // ── Section cards ────────────────────────────────────────────────────────────
@@ -198,7 +184,7 @@ function OccupancyCard() {
         </CardTitle>
       </CardHeader>
       <CardContent className="px-6 py-0 flex flex-col items-center gap-4">
-        <SimpleDonut percent={25} label="出租率" />
+        <Donut percent={25} label="出租率" />
         <div className="flex flex-col gap-3 w-full">
           {locations.map(loc => (
             <div key={loc.name} className="flex flex-col gap-1.5">
@@ -218,9 +204,9 @@ function OccupancyCard() {
 
 function LeaseReminderCard() {
   const rows = [
-    { count: "5 件", label: "30 天內到期", color: "var(--color-teal)" },
-    { count: "10 件", label: "31-60 天內到期", color: "var(--color-teal)" },
-    { count: "12 件", label: "61-90 天內到期", color: "var(--color-teal)" },
+    { count: "5 件", label: "30 天內到期" },
+    { count: "10 件", label: "31-60 天內到期" },
+    { count: "12 件", label: "61-90 天內到期" },
   ]
   return (
     <Card className="flex-1 rounded-[6px] py-6 gap-4">
@@ -239,7 +225,7 @@ function LeaseReminderCard() {
             <div key={row.label} className="flex flex-col gap-2 px-6 py-4 rounded-[6px] bg-gray-50">
               <p className="text-xl font-semibold">{row.count}</p>
               <div className="flex items-center gap-2">
-                <div className="size-2 rounded-full" style={{ backgroundColor: row.color }} />
+                <ColorDot className="bg-teal" />
                 <p className="text-xs text-gray-500">{row.label}</p>
               </div>
             </div>
@@ -252,10 +238,10 @@ function LeaseReminderCard() {
 
 function VacancyCard() {
   const rows = [
-    { label: "14 天內 (8)", color: "var(--color-teal)" },
-    { label: "15-30 天 (4)", color: "var(--color-brand)" },
-    { label: "31-60 天 (3)", color: "#6b7280" },
-    { label: "61 天以上 (5)", color: "#111827" },
+    { label: "14 天內 (8)", dotClassName: "bg-teal" },
+    { label: "15-30 天 (4)", dotClassName: "bg-brand" },
+    { label: "31-60 天 (3)", dotClassName: "bg-gray-500" },
+    { label: "61 天以上 (5)", dotClassName: "bg-gray-900" },
   ]
   return (
     <Card className="flex-1 rounded-[6px] py-6 gap-4">
@@ -270,7 +256,7 @@ function VacancyCard() {
           {rows.map((row, i) => (
             <div key={row.label}>
               <div className="flex items-center gap-2 py-2">
-                <div className="size-2 rounded-full shrink-0" style={{ backgroundColor: row.color }} />
+                <ColorDot className={row.dotClassName} />
                 <span className="flex-1 text-sm font-semibold">{row.label}</span>
                 <ChevronDownIcon className="size-4 text-muted-foreground" />
               </div>
@@ -372,36 +358,38 @@ export function OverviewSection() {
                       <span className="text-2xl font-semibold">$1,320,000</span>
                     </div>
                     <div className="h-2 w-full rounded-[10px] overflow-hidden flex">
-                      <div style={{ width: `${tealPct}%`, backgroundColor: "var(--color-teal)" }} />
-                      <div style={{ width: `${pinkPct}%`, backgroundColor: "var(--color-brand)" }} />
+                      <div style={{ width: `${tealPct}%` }} className="bg-teal" />
+                      <div style={{ width: `${pinkPct}%` }} className="bg-brand" />
                       <div className="flex-1 bg-gray-500" />
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2">
                     {[
-                      { color: "var(--color-teal)", label: "實收", amount: "$660,000", sub: "含押金 $40,000", link: false },
-                      { color: "var(--color-brand)", label: "逾時未收", amount: "$540,000", sub: "查看明細", link: true },
-                      { color: "#6b7280", label: "待收", amount: "$120,000", sub: "查看明細", link: true },
+                      { dotClassName: "bg-teal", label: "實收", amount: "$660,000", sub: "含押金 $40,000", link: false },
+                      { dotClassName: "bg-brand", label: "逾時未收", amount: "$540,000", sub: "查看明細", link: true },
+                      { dotClassName: "bg-gray-500", label: "待收", amount: "$120,000", sub: "查看明細", link: true },
                     ].map(item => (
                       <div key={item.label} className="flex-1 flex flex-col gap-2 px-6 py-4 rounded-[6px] bg-gray-50">
                         <div className="flex items-center gap-2">
-                          <div className="size-2 rounded-full" style={{ backgroundColor: item.color }} />
+                          <ColorDot className={item.dotClassName} />
                           <span className="text-sm text-gray-500">{item.label}</span>
                         </div>
                         <span className="text-xl font-semibold">{item.amount}</span>
                         {item.link
-                          ? <a href="#" className="text-sm underline text-teal">{item.sub}</a>
+                          ? <Button variant="link" nativeButton={false} className="h-auto w-fit p-0 text-sm text-teal" render={<a href="#" />}>{item.sub}</Button>
                           : <span className="text-sm text-gray-500">{item.sub}</span>}
                       </div>
                     ))}
                   </div>
-                  <div className="flex items-center gap-2.5 px-4 py-2 rounded-[6px] bg-yellow-50">
-                    <p className="flex-1 text-xs">💡 另有 3 筆帳單尚未出帳，出帳後將自動納入統計</p>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <a href="#" className="text-xs underline whitespace-nowrap">前往出帳</a>
-                      <ChevronRightIcon className="size-5" />
-                    </div>
-                  </div>
+                  <Alert className="flex items-center gap-2.5 border-yellow-200 bg-yellow-50 px-4 py-2">
+                    <AlertDescription className="flex-1 text-xs text-foreground">
+                      💡 另有 3 筆帳單尚未出帳，出帳後將自動納入統計
+                    </AlertDescription>
+                    <Button variant="link" nativeButton={false} className="h-auto shrink-0 gap-1 p-0 text-xs whitespace-nowrap" render={<a href="#" />}>
+                      前往出帳
+                      <ChevronRightIcon className="size-4" />
+                    </Button>
+                  </Alert>
                 </div>
                 <PaymentDonut />
               </div>
@@ -447,13 +435,13 @@ export function OverviewSection() {
                   <Separator />
                   <div className="flex flex-col gap-2 text-sm">
                     {[
-                      { label: "當期收押金", value: "+NT$40,000", color: "var(--color-teal)" },
-                      { label: "當期退押金", value: "-NT$15,000", color: "#f43f5e" },
-                      { label: "押金轉費用", value: "-NT$8,000", color: "#f43f5e" },
+                      { label: "當期收押金", value: "+NT$40,000", textClassName: "text-teal" },
+                      { label: "當期退押金", value: "-NT$15,000", textClassName: "text-rose-500" },
+                      { label: "押金轉費用", value: "-NT$8,000", textClassName: "text-rose-500" },
                     ].map(row => (
                       <div key={row.label} className="flex items-center justify-between">
                         <span>{row.label}</span>
-                        <span className="font-semibold" style={{ color: row.color }}>{row.value}</span>
+                        <span className={cn("font-semibold", row.textClassName)}>{row.value}</span>
                       </div>
                     ))}
                   </div>

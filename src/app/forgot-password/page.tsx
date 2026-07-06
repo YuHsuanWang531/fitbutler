@@ -12,15 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-function FieldLabel({ label, required }: { label: string; required?: boolean }) {
-  return (
-    <div className="flex items-center mb-1">
-      <span className="text-sm font-medium text-black">{label}</span>
-      {required && <span className="text-sm font-medium text-destructive ml-0.5">*</span>}
-    </div>
-  )
-}
+import { FieldLabel } from "@/components/field-label"
 
 export default function ForgotPasswordPage() {
   const [language, setLanguage] = useState("繁體中文")
@@ -42,8 +34,8 @@ export default function ForgotPasswordPage() {
   return (
     <div className="relative min-h-screen bg-black flex items-center justify-center p-6 overflow-hidden">
       {/* Background glows */}
-      <div className="pointer-events-none absolute right-[-80px] top-[-280px] size-[540px] rounded-full bg-[#d7006f] opacity-60 blur-[120px]" />
-      <div className="pointer-events-none absolute right-[-160px] top-[-150px] size-[320px] rounded-full bg-[#48b4c4] opacity-50 blur-[80px]" />
+      <div className="pointer-events-none absolute right-[-80px] top-[-280px] size-[540px] rounded-full bg-brand opacity-60 blur-[120px]" />
+      <div className="pointer-events-none absolute right-[-160px] top-[-150px] size-[320px] rounded-full bg-teal opacity-50 blur-[80px]" />
 
       <div className="relative flex w-full max-w-[372px] flex-col gap-4">
         {/* Language selector */}

@@ -1,7 +1,6 @@
 "use client"
 
 import { useLayoutEffect, useRef, useState } from "react"
-import { motion } from "motion/react"
 import { Pencil, Plus } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -88,16 +87,14 @@ export function EnterpriseSettingsSection() {
               key={tab.value}
               value={tab.value}
               ref={(el) => { tabRefs.current[index] = el }}
-              className="bg-background dark:data-[state=active]:bg-background relative z-10 h-full flex-none rounded-none border-0 px-6 text-sm font-medium text-muted-foreground data-active:text-[#d7006f] data-active:hover:text-[#d7006f] data-active:shadow-none!"
+              className="bg-background dark:data-[state=active]:bg-background relative z-10 h-full flex-none rounded-none border-0 px-6 text-sm font-medium text-muted-foreground data-active:text-brand data-active:hover:text-brand data-active:shadow-none!"
             >
               {tab.name}
             </TabsTrigger>
           ))}
-          <motion.div
-            className="bg-[#d7006f] absolute bottom-0 z-20 h-0.5"
-            layoutId="underline"
+          <div
+            className="bg-brand absolute bottom-0 z-20 h-0.5 transition-[left,width] duration-300 ease-out"
             style={{ left: underlineStyle.left, width: underlineStyle.width }}
-            transition={{ type: "spring", stiffness: 400, damping: 40 }}
           />
         </TabsList>
 

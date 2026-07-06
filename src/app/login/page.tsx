@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { EyeIcon, EyeOffIcon, LanguagesIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -14,15 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-function FieldLabel({ label, required }: { label: string; required?: boolean }) {
-  return (
-    <div className="flex items-center mb-1">
-      <span className="text-sm font-medium text-black">{label}</span>
-      {required && <span className="text-sm font-medium text-destructive ml-0.5">*</span>}
-    </div>
-  )
-}
+import { FieldLabel } from "@/components/field-label"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -77,8 +70,8 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen bg-black flex items-center justify-center p-6 overflow-hidden">
       {/* Background glows */}
-      <div className="pointer-events-none absolute right-[-80px] top-[-280px] size-[540px] rounded-full bg-[#d7006f] opacity-60 blur-[120px]" />
-      <div className="pointer-events-none absolute right-[-160px] top-[-150px] size-[320px] rounded-full bg-[#48b4c4] opacity-50 blur-[80px]" />
+      <div className="pointer-events-none absolute right-[-80px] top-[-280px] size-[540px] rounded-full bg-brand opacity-60 blur-[120px]" />
+      <div className="pointer-events-none absolute right-[-160px] top-[-150px] size-[320px] rounded-full bg-teal opacity-50 blur-[80px]" />
 
       <div className="relative flex w-full max-w-[372px] flex-col gap-4">
         {/* Language selector */}
@@ -175,14 +168,16 @@ export default function LoginPage() {
                 aria-invalid={!!passwordError || passwordEmpty}
                 className="h-9 rounded-[8px] border-input bg-white pr-9 text-sm shadow-xs"
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-sm"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground"
+                className="absolute inset-y-0 right-1 top-1/2 -translate-y-1/2 text-muted-foreground"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeIcon className="size-4" /> : <EyeOffIcon className="size-4" />}
-              </button>
+              </Button>
             </div>
             {passwordError && <p className="text-sm text-destructive px-1 pt-1">{passwordError}</p>}
           </div>
@@ -196,9 +191,14 @@ export default function LoginPage() {
           </Button>
 
           {/* 忘記密碼 */}
-          <button type="button" className="text-left text-sm text-black underline" onClick={() => router.push("/forgot-password")}>
+          <Button
+            variant="link"
+            nativeButton={false}
+            className="self-start px-0 text-sm text-black"
+            render={<Link href="/forgot-password" />}
+          >
             忘記密碼
-          </button>
+          </Button>
         </div>
       </div>
     </div>

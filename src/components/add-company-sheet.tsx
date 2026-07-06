@@ -1,8 +1,10 @@
 "use client"
 
-import { useRef, useState } from "react"
-import { X, HelpCircle, PlusIcon } from "lucide-react"
+import { useState } from "react"
+import { X, PlusIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ImageUploadField } from "@/components/image-upload-field"
+import { FieldLabel } from "@/components/field-label"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
@@ -35,76 +37,35 @@ import {
 
 const countryItems = [
   { value: "", label: "請選擇公司登記國家" },
-  { value: "tw", label: "台灣" },
-  { value: "my", label: "馬來西亞" },
-  { value: "jp", label: "日本" },
-  { value: "kr", label: "韓國" },
-  { value: "sg", label: "新加坡" },
-  { value: "hk", label: "香港" },
-  { value: "cn", label: "中國" },
-  { value: "th", label: "泰國" },
-  { value: "vn", label: "越南" },
-  { value: "ph", label: "菲律賓" },
-  { value: "id", label: "印尼" },
-  { value: "us", label: "美國" },
-  { value: "gb", label: "英國" },
-  { value: "de", label: "德國" },
-  { value: "fr", label: "法國" },
-  { value: "au", label: "澳洲" },
-  { value: "ca", label: "加拿大" },
-  { value: "nz", label: "紐西蘭" },
-  { value: "in", label: "印度" },
-  { value: "br", label: "巴西" },
+  { value: "tw", label: "台灣", currency: "新台幣 (TWD)" },
+  { value: "my", label: "馬來西亞", currency: "馬來西亞令吉 (MYR)" },
+  { value: "jp", label: "日本", currency: "日圓 (JPY)" },
+  { value: "kr", label: "韓國", currency: "韓元 (KRW)" },
+  { value: "sg", label: "新加坡", currency: "新加坡幣 (SGD)" },
+  { value: "hk", label: "香港", currency: "港幣 (HKD)" },
+  { value: "cn", label: "中國", currency: "人民幣 (CNY)" },
+  { value: "th", label: "泰國", currency: "泰銖 (THB)" },
+  { value: "vn", label: "越南", currency: "越南盾 (VND)" },
+  { value: "ph", label: "菲律賓", currency: "菲律賓披索 (PHP)" },
+  { value: "id", label: "印尼", currency: "印尼盾 (IDR)" },
+  { value: "us", label: "美國", currency: "美元 (USD)" },
+  { value: "gb", label: "英國", currency: "英鎊 (GBP)" },
+  { value: "de", label: "德國", currency: "歐元 (EUR)" },
+  { value: "fr", label: "法國", currency: "歐元 (EUR)" },
+  { value: "au", label: "澳洲", currency: "澳幣 (AUD)" },
+  { value: "ca", label: "加拿大", currency: "加拿大幣 (CAD)" },
+  { value: "nz", label: "紐西蘭", currency: "紐西蘭幣 (NZD)" },
+  { value: "in", label: "印度", currency: "印度盧比 (INR)" },
+  { value: "br", label: "巴西", currency: "巴西雷亞爾 (BRL)" },
 ]
 
-const countryCurrencyMap: Record<string, string> = {
-  tw: "新台幣 (TWD)",
-  my: "馬來西亞令吉 (MYR)",
-  jp: "日圓 (JPY)",
-  kr: "韓元 (KRW)",
-  sg: "新加坡幣 (SGD)",
-  hk: "港幣 (HKD)",
-  cn: "人民幣 (CNY)",
-  th: "泰銖 (THB)",
-  vn: "越南盾 (VND)",
-  ph: "菲律賓披索 (PHP)",
-  id: "印尼盾 (IDR)",
-  us: "美元 (USD)",
-  gb: "英鎊 (GBP)",
-  de: "歐元 (EUR)",
-  fr: "歐元 (EUR)",
-  au: "澳幣 (AUD)",
-  ca: "加拿大幣 (CAD)",
-  nz: "紐西蘭幣 (NZD)",
-  in: "印度盧比 (INR)",
-  br: "巴西雷亞爾 (BRL)",
-}
+const countryCurrencyMap: Record<string, string> = Object.fromEntries(
+  countryItems.filter((c) => c.currency).map((c) => [c.value, c.currency!])
+)
 
 interface AddCompanySheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-function FieldLabel({
-  label,
-  required,
-  helpIcon,
-  htmlFor,
-}: {
-  label: string
-  required?: boolean
-  helpIcon?: boolean
-  htmlFor?: string
-}) {
-  return (
-    <div className="flex items-center gap-1 px-1 py-1">
-      <Label htmlFor={htmlFor} className="text-sm font-medium text-black cursor-pointer">
-        {label}
-      </Label>
-      {helpIcon && <HelpCircle className="size-3.5 text-muted-foreground cursor-pointer" />}
-      {required && <span className="text-sm font-medium text-destructive">*</span>}
-    </div>
-  )
 }
 
 function CountryCombobox({
@@ -153,34 +114,6 @@ function CountryCombobox({
   )
 }
 
-
-function FileInputField({ id }: { id: string }) {
-  const [fileName, setFileName] = useState("未選擇檔案")
-  const fileRef = useRef<HTMLInputElement>(null)
-
-  return (
-    <div className="flex items-stretch w-full">
-      <Button
-        type="button"
-        className="rounded-r-none rounded-l-[10px] shrink-0"
-        onClick={() => fileRef.current?.click()}
-      >
-        選擇檔案
-      </Button>
-      <input
-        ref={fileRef}
-        id={id}
-        type="file"
-        accept=".png,.jpg,.jpeg"
-        className="hidden"
-        onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "未選擇檔案")}
-      />
-      <div className="flex flex-1 items-center border border-l-0 border-input bg-white px-3 rounded-r-lg min-w-0 h-9">
-        <span className="text-sm text-muted-foreground truncate">{fileName}</span>
-      </div>
-    </div>
-  )
-}
 
 export function AddCompanySheet({ open, onOpenChange }: AddCompanySheetProps) {
   const [isLegalPerson, setIsLegalPerson] = useState(false)
@@ -308,21 +241,21 @@ export function AddCompanySheet({ open, onOpenChange }: AddCompanySheetProps) {
             {/* 租賃住宅管理者章 */}
             <div className="flex flex-col w-[300px]">
               <FieldLabel label="租賃住宅管理者章" helpIcon />
-              <FileInputField id="rental-seal" />
+              <ImageUploadField id="rental-seal" label="租賃住宅管理者章" aspectRatio={1} />
               <p className="text-xs text-muted-foreground px-1 pt-1">檔案大小上限 10MB，僅支援 png, jpg, jpeg</p>
             </div>
 
             {/* 公司大章 */}
             <div className="flex flex-col w-[300px]">
               <FieldLabel label="公司大章" helpIcon />
-              <FileInputField id="company-seal-large" />
+              <ImageUploadField id="company-seal-large" label="公司大章" aspectRatio={1} />
               <p className="text-xs text-muted-foreground px-1 pt-1">檔案大小上限 10MB，僅支援 png, jpg, jpeg</p>
             </div>
 
             {/* 公司小章 */}
             <div className="flex flex-col w-[300px]">
               <FieldLabel label="公司小章" helpIcon />
-              <FileInputField id="company-seal-small" />
+              <ImageUploadField id="company-seal-small" label="公司小章" aspectRatio={1} />
               <p className="text-xs text-muted-foreground px-1 pt-1">檔案大小上限 10MB，僅支援 png, jpg, jpeg</p>
             </div>
 
