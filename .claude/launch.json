@@ -9,6 +9,12 @@
       "autoPort": true
     },
     {
+      "name": "dream-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/wangyuxuan/Desktop/AI agent/dream/web", "run", "dev", "--", "--port", "3100"],
+      "port": 3100
+    },
+    {
       "name": "portfolio",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "-l", "4001", "/Users/wangyuxuan/Desktop/AI agent/portfolio"],

@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { X, Plus, RotateCcw, RotateCw, SquareSplitHorizontal, SquareSplitVertical } from "lucide-react"
+import { X, Plus } from "lucide-react"
 import { Cropper, CropperRef, createAspectRatio } from "react-advanced-cropper"
 import "react-advanced-cropper/dist/style.css"
 import { Button } from "@/components/ui/button"
@@ -11,40 +11,11 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { CropperToolbar } from "@/components/cropper-toolbar"
+import { useCropperActions } from "@/hooks/use-cropper-actions"
+import { ALLOWED_IMAGE_TYPES, formatFileSize, letterboxToSquare } from "@/lib/image-utils"
 
-const ALLOWED_TYPES = ["image/png", "image/jpeg"]
 const OUTPUT_WIDTH = 900
-const LETTERBOX_SIZE = 1000
-const LETTERBOX_FILL = "#000"
-const LETTERBOX_JPEG_QUALITY = 0.95
-
-function formatFileSize(bytes: number): string {
-  const kb = bytes / 1024
-  if (kb < 1024) return `${Math.round(kb)}KB`
-  return `${(kb / 1024).toFixed(1)}MB`
-}
-
-function letterboxToSquare(file: File): Promise<string> {
-  return new Promise((resolve) => {
-    const objectUrl = URL.createObjectURL(file)
-    const img = new Image()
-    img.onload = () => {
-      const canvas = document.createElement("canvas")
-      canvas.width = LETTERBOX_SIZE
-      canvas.height = LETTERBOX_SIZE
-      const ctx = canvas.getContext("2d")!
-      ctx.fillStyle = LETTERBOX_FILL
-      ctx.fillRect(0, 0, LETTERBOX_SIZE, LETTERBOX_SIZE)
-      const scale = LETTERBOX_SIZE / img.naturalWidth
-      const w = LETTERBOX_SIZE
-      const h = img.naturalHeight * scale
-      ctx.drawImage(img, 0, (LETTERBOX_SIZE - h) / 2, w, h)
-      URL.revokeObjectURL(objectUrl)
-      resolve(canvas.toDataURL("image/jpeg", LETTERBOX_JPEG_QUALITY))
-    }
-    img.src = objectUrl
-  })
-}
 
 interface ImageUploadFieldProps {
   id: string
@@ -60,11 +31,12 @@ export function ImageUploadField({ id, label, aspectRatio }: ImageUploadFieldPro
   const [fileMeta, setFileMeta] = useState<{ name: string; size: number } | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const cropperActions = useCropperActions(cropperRef)
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     e.target.value = ""
-    if (!file || !ALLOWED_TYPES.includes(file.type)) return
+    if (!file || !ALLOWED_IMAGE_TYPES.includes(file.type)) return
     const src = await letterboxToSquare(file)
     setRawSrc(src)
     setFileMeta({ name: file.name, size: file.size })
@@ -94,17 +66,6 @@ export function ImageUploadField({ id, label, aspectRatio }: ImageUploadFieldPro
   function handleDialogClose(open: boolean) {
     if (!open) setRawSrc(null)
     setDialogOpen(open)
-  }
-
-  function transformImageInPlace(action: () => void) {
-    const prevState = cropperRef.current?.getState()
-    action()
-    if (prevState) {
-      cropperRef.current?.setState(
-        (state) => state && { ...state, coordinates: prevState.coordinates, visibleArea: prevState.visibleArea },
-        { immediately: true }
-      )
-    }
   }
 
   return (
@@ -187,48 +148,13 @@ export function ImageUploadField({ id, label, aspectRatio }: ImageUploadFieldPro
                   className="size-full"
                 />
               </div>
-              <div className="bg-[#171717] flex items-start justify-between px-9 py-4 w-[500px] shrink-0">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => transformImageInPlace(() => cropperRef.current?.flipImage(true, false))}
-                  className="text-white hover:bg-white/10 hover:text-white"
-                  title="水平翻轉"
-                >
-                  <SquareSplitHorizontal className="size-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => transformImageInPlace(() => cropperRef.current?.rotateImage(-90))}
-                  className="text-white hover:bg-white/10 hover:text-white"
-                  title="逆時針旋轉"
-                >
-                  <RotateCcw className="size-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => transformImageInPlace(() => cropperRef.current?.rotateImage(90))}
-                  className="text-white hover:bg-white/10 hover:text-white"
-                  title="順時針旋轉"
-                >
-                  <RotateCw className="size-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => transformImageInPlace(() => cropperRef.current?.flipImage(false, true))}
-                  className="text-white hover:bg-white/10 hover:text-white"
-                  title="垂直翻轉"
-                >
-                  <SquareSplitVertical className="size-5" />
-                </Button>
-              </div>
+              <CropperToolbar
+                onFlipHorizontal={cropperActions.flipHorizontal}
+                onFlipVertical={cropperActions.flipVertical}
+                onRotateCcw={cropperActions.rotateCcw}
+                onRotateCw={cropperActions.rotateCw}
+                className="w-[500px]"
+              />
             </div>
           )}
 

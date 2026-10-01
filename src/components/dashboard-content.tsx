@@ -3,10 +3,12 @@
 import { useNav } from "@/contexts/nav-context"
 import { OverviewSection } from "@/components/overview-section"
 import { EnterpriseSettingsSection } from "@/components/enterprise-settings-section"
+import { PaymentSettingsSection } from "@/components/payment-settings-section"
 
 const SECTIONS = [
   { title: "總覽", Component: OverviewSection, padded: true },
   { title: "企業管理", Component: EnterpriseSettingsSection, padded: false },
+  { title: "收款設定", Component: PaymentSettingsSection, padded: false },
 ] as const
 
 export function DashboardContent() {
